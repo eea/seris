@@ -3,6 +3,7 @@ from fabric.contrib.files import *
 from path import path as ppath
 
 app = env.app = {
+    'seris_svn': 'https://svn.eionet.europa.eu/repositories/Python/seris',
     'reportdb_svn': 'https://svn.eionet.europa.eu/repositories/Naaya/trunk/eggs/reportdb',
     'localrepo': ppath(__file__).abspath().parent.parent,
 }
@@ -45,7 +46,7 @@ def _svn_repo(repo_path, origin_url, update=True):
 
 @task
 def install_serisbeta():
-    _svn_repo(app['serisbeta_repo'], app['reportdb_svn'], update=True)
+    _svn_repo(app['serisbeta_repo'], app['seris_svn'], update=True)
 
     if not exists(app['sandbox_serisbeta']):
         run("virtualenv "# -p python2.6 
@@ -69,7 +70,7 @@ def install_serisbeta():
 
 @task
 def install_seris():
-    _svn_repo(app['seris_repo'], app['reportdb_svn'], update=True)
+    _svn_repo(app['seris_repo'], app['seris_svn'], update=True)
 
     if not exists(app['sandbox_seris']):
         run("virtualenv "# -p python2.6 
