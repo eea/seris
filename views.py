@@ -732,7 +732,7 @@ def report_view(report_id):
                       },
             'country': country,
             'region': region,
-            'edit_is_allowed': edit_is_allowed(),
+            'edit_is_allowed': edit_is_allowed(report_id),
         }
     )
 
