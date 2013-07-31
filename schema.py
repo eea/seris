@@ -102,8 +102,24 @@ class AccessibleCountries(Validator):
 
         return True
 
-def check_common(needed_rights, existing_rights):
-    return not set(needed_rights).isdisjoint(set(existing_rights))
+class SubregionValidator(Validator):
+
+    fail = None
+
+    def validate(self, element, state):
+        countries = element.parent['country'].value
+        for country in countries:
+            subregions = subregions_dict.get(country)
+            if subregions:
+                if not check_common(subregions, element.value):
+                    element.errors.append('At least one sub-region must be '
+                                      'selected for country %s' % (country))
+                    return False
+
+        return True
+
+def check_common(list1, list2):
+    return not set(list1).isdisjoint(set(list2))
 
 ReportSchema = fl.Dict.with_properties(widget="schema") \
                       .of(
@@ -137,7 +153,8 @@ ReportSchema = fl.Dict.with_properties(widget="schema") \
         ),
 
         fl.List.named('subregion') \
-               .using(label=u"Sub-national", optional=True) \
+               .using(label=u"Sub-national") \
+               .including_validators(SubregionValidator()) \
                .with_properties(widget="multiple_select",
                                 widget_chosen=True,
                                 placeholder="Select sub-regions ...") \

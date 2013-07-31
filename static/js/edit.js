@@ -149,7 +149,7 @@ $(document).ready(function() {
 	if ($('#f_header_country option').length == 1)
 	{
 		setTimeout(function(){
-				$('#f_header_country').select2('disable');
+				$('#f_header_country').select2('readonly', true);
 		}, 1);
 	}
 
@@ -192,7 +192,7 @@ $(document).ready(function() {
 					{
 						$('#f_header_country option[value="'+data[0]+'"]')
 							.attr('selected', 'selected');
-						$('#f_header_country').select2('disable');
+						$('#f_header_country').select2('readonly', true);
 					}
 				}
 			});
@@ -242,7 +242,6 @@ $(document).ready(function() {
 	function process_subregions(onload){
 		var selected_countries = get_list('country', true);
 		var selected_subregions = get_list('subregion', true);
-		var subregions = get_list('subregion', false);
 		var changed = false;
 
 		$.each(selected_subregions, function(index,subregion){
@@ -250,7 +249,6 @@ $(document).ready(function() {
 			if(indexOf(parent_country, selected_countries) === -1){
 				changed = true;
 				$('#f_header_subregion option[value="'+subregion+'"]').remove();
-				//$('#f_header_subregion option[value="'+subregion+'"]').removeAttr('selected');
 			}
 		});
 
@@ -272,7 +270,8 @@ $(document).ready(function() {
 						return false;
 					}
 				});
-				if (new_country === true){
+				if (!onload && new_country === true){
+					/*If onload, new_country is only falsly true*/
 					changed = true;
 					$.each(subregions_dict[country], function(index, subregion){
 						$('#f_header_subregion')
@@ -284,8 +283,8 @@ $(document).ready(function() {
 			}
 		});
 
-		selected_subregions = get_list('subregion', true);
-		if (selected_subregions.length === 0){
+		var available_subregions = get_list('subregion', false);
+		if (available_subregions.length === 0){
 			$('#f_header_subregion').parent().parent().slideUp(300);
 		}
 		else if ($('#f_header_subregion').parent().parent().css('display') === 'none'){
@@ -317,7 +316,7 @@ $(document).ready(function() {
 			});
 		}
 		else{
-			$('#f_header_'+list).each(function(){
+			$('#f_header_'+list+' option').each(function(){
 				selected_list.push($(this).val());
 			});
 		}

@@ -13,7 +13,8 @@ import json
 import file_upload
 from gtranslate import translate
 import frame
-from schema import countries_list, countries_dict, regions_dict, subregions_dict, check_common, mappings
+from schema import countries_list, countries_dict, regions_dict
+from schema import subregions_dict, check_common, mappings
 from rdflib import Graph, Literal, BNode, Namespace, RDF, URIRef
 from rdflib.namespace import DC, FOAF, DCTERMS, SKOS, RDFS
 
@@ -78,14 +79,16 @@ def edit_is_allowed(report_id=None):
 
 
 def process_country_list(group_ids):
-    global processed_country_list
-    processed_country_list = list(countries_list)
-    for country in countries_list:
-        for group_id in countries_dict[country]:
-            if group_id in group_ids:
-                break
-        else:
-            processed_country_list.remove(country)
+    roles = getattr(flask.g, 'user_roles', [])
+    if not 'Administrator' in roles:
+        global processed_country_list
+        processed_country_list = list(countries_list)
+        for country in countries_list:
+            for group_id in countries_dict[country]:
+                if group_id in group_ids:
+                    break
+            else:
+                processed_country_list.remove(country)
 
 def require_edit_permission(func):
     @wraps(func)
