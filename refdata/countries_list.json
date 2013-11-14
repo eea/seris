@@ -4,7 +4,7 @@
 ["Belgium", ["eionet-nfp-mc-be", "eionet-nrc-soe-mc-be"]],
 ["Bosnia and Herzegovina", ["eionet-nfp-cc-ba", "eionet-nrc-soe-cc-ba"]],
 ["Bulgaria", ["eionet-nfp-mc-bg", "eionet-nrc-soe-mc-bg"]],
-["Croatia", ["eionet-nfp-cc-hr", "eionet-nrc-soe-cc-hr"]],
+["Croatia", ["eionet-nfp-mc-hr", "eionet-nrc-soe-mc-hr"]],
 ["Cyprus", ["eionet-nfp-mc-cy", "eionet-nrc-soe-mc-cy"]],
 ["Czech Republic", ["eionet-nfp-mc-cz", "eionet-nrc-soe-mc-cz"]],
 ["Denmark", ["eionet-nfp-mc-dk", "eionet-nrc-soe-mc-dk"]],
