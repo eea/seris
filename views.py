@@ -18,6 +18,7 @@ from schema import subregions_dict, check_common, mappings
 from rdflib import Graph, Literal, BNode, Namespace, RDF, URIRef
 from rdflib.namespace import DC, FOAF, DCTERMS, SKOS, RDFS
 
+
 def _load_json(name):
     with open(os.path.join(os.path.dirname(__file__), name), "rb") as f:
         return json.load(f)
@@ -26,6 +27,7 @@ def _load_json(name):
 eea_countries = _load_json("refdata/eea_countries.json")
 cooperating_countries = _load_json("refdata/cooperating_countries.json")
 processed_country_list = list(countries_list)
+
 
 class MarkupGenerator(flatland.out.markup.Generator):
 
@@ -50,6 +52,7 @@ views = flask.Blueprint('views', __name__)
 
 
 views.before_request(frame.get_frame_before_request)
+
 
 def edit_is_allowed(report_id=None):
 
@@ -80,7 +83,7 @@ def edit_is_allowed(report_id=None):
 
 def process_country_list(group_ids):
     roles = getattr(flask.g, 'user_roles', [])
-    if not 'Administrator' in roles:
+    if 'Administrator' not in roles:
         global processed_country_list
         processed_country_list = list(countries_list)
         for country in countries_list:
@@ -89,6 +92,7 @@ def process_country_list(group_ids):
                     break
             else:
                 processed_country_list.remove(country)
+
 
 def require_edit_permission(func):
     @wraps(func)
@@ -108,7 +112,7 @@ def index():
     eea_countries_list = []
     cooperating_countries_list = []
     report_list = [schema.ReportSchema.from_flat(row)
-                    for row in database.get_all_reports()]
+                   for row in database.get_all_reports()]
     for country in eea_countries:
         count = 0
         for report in report_list:
@@ -136,20 +140,20 @@ def index():
 
 @views.route('/reports/')
 def report_list():
-    report_list = [{
-                    'id': row.id,
-                    'extended_info': row['format_availability_paper_or_web'] and 'Yes' or 'No',
+    report_list = [{'id': row.id,
+                    'extended_info': row[
+                        'format_availability_paper_or_web'] and 'Yes' or 'No',
                     'data': schema.ReportSchema.from_flat(row)}
-                        for row in database.get_all_reports()]
+                   for row in database.get_all_reports()]
     country = flask.request.args.get('country')
     region = flask.request.args.get('region')
     if country:
         report_list = [report for report in report_list
-            if country in report['data']['header']['country'].value
-           and len(report['data']['header']['country'].value) == 1]
+                       if country in report['data']['header']['country'].value
+                       and len(report['data']['header']['country'].value) == 1]
     if region:
         report_list = [report for report in report_list
-            if region in report['data']['header']['region'].value]
+                       if region in report['data']['header']['region'].value]
     return flask.render_template('report_list.html', **{
         'report_list': report_list,
         'country': country,
@@ -171,15 +175,18 @@ def _expand_lists(form_data, keys):
 def get_regions(report_id=None):
     return flask.json.dumps(regions_dict)
 
+
 @views.route('/reports/new/get_countries', methods=['GET'])
 @views.route('/reports/<int:report_id>/edit/get_countries', methods=['GET'])
 def get_countries(report_id=None):
     return flask.json.dumps(processed_country_list)
 
+
 @views.route('/reports/new/get_subregions', methods=['GET'])
 @views.route('/reports/<int:report_id>/edit/get_subregions', methods=['GET'])
 def get_subregions(report_id=None):
     return flask.json.dumps(subregions_dict)
+
 
 @views.route('/reports/new/', methods=['GET', 'POST'])
 @views.route('/reports/<int:report_id>/edit/', methods=['GET', 'POST'])
@@ -202,7 +209,7 @@ def report_edit(report_id=None):
         report_row = database.get_report_or_404(report_id)
         reviews_list = database.get_seris_reviews_list(report_id)
         if reviews_list:
-            #TODO to be changed when there will be more than one seris
+            # TODO to be changed when there will be more than one seris
             seris_review_row = reviews_list[0]
         else:
             seris_review_row = database.SerisReviewRow()
@@ -214,8 +221,9 @@ def report_edit(report_id=None):
         form_data.update(schema.SerisReviewSchema.from_defaults().flatten())
         form_data.update(flask.request.form.to_dict())
         _expand_lists(form_data, ['header_region', 'header_country',
-            'header_subregion', 'details_translated_in',
-            'details_original_language', 'links_target_audience'])
+                                  'header_subregion', 'details_translated_in',
+                                  'details_original_language',
+                                  'links_target_audience'])
 
         report_schema = schema.ReportSchema.from_flat(form_data)
         seris_review_schema = schema.SerisReviewSchema.from_flat(form_data)
@@ -226,7 +234,7 @@ def report_edit(report_id=None):
             report_row.clear()
             report_row.update(report_schema.flatten())
             session.save(report_row)
-            #TODO create filter to display data without losing information
+            # TODO create filter to display data without losing information
             if report_row['format_report_type'] == 'report (static source)':
                 report_row['format_date_of_last_update'] = ''
                 report_row['format_freq_of_upd'] = ''
@@ -278,14 +286,17 @@ def report_edit(report_id=None):
                 return flask.redirect(url)
 
         session.rollback()
-        flask.flash("Errors in form.", "error")
+        flask.flash("There were some errors in the submitted form. "
+                    "Please review look further down for the error messages.",
+                    "error")
 
     else:
         report_schema = schema.ReportSchema()
         seris_review_schema = schema.SerisReviewSchema()
         if report_id is not None:
             report_schema = schema.ReportSchema.from_flat(report_row)
-            seris_review_schema = schema.SerisReviewSchema.from_flat(seris_review_row)
+            seris_review_schema = schema.SerisReviewSchema.from_flat(
+                seris_review_row)
 
     app = flask.current_app
     return flask.render_template('report-edit.html', **{
@@ -302,10 +313,12 @@ def report_edit(report_id=None):
 def reports_rdf_mapping():
     return flask.jsonify(mappings)
 
+
 @views.route('/ontology/schema', methods=['GET'])
 def reports_ontology():
-    f = open('refdata/schema.rdf','r')
+    f = open('refdata/schema.rdf', 'r')
     return flask.Response(f.read(), mimetype='text/xml')
+
 
 @views.route('/rdf/', methods=['GET'])
 def reports_rdf():
@@ -325,7 +338,7 @@ def reports_rdf():
 
     for entry in export:
         current_id = entry['report_id']
-        current_uri = flask.url_for('views.report_view', report_id = current_id, _external = True)
+        current_uri = flask.url_for('views.report_view', report_id=current_id, _external=True)
 
         node = URIRef(current_uri)
 
@@ -372,7 +385,6 @@ def reports_rdf():
             g.add((item, DCTERMS.subject, Literal(entry[lang_field])))
             lang_id += 1
             lang_field = 'details_translated_in_%s' % lang_id
-
 
         if entry['details_english_name']:
             g.add((
@@ -470,26 +482,26 @@ def reports_rdf():
                 bibo.shortDescription,
                 Literal(entry['links_explanatory_text'])))
 
-        topics = { "env_issues": ['air',
-                                  'biodiversity',
-                                  'chemicals',
-                                  'climate',
-                                  'human',
-                                  'landuse',
-                                  'natural',
-                                  'noise',
-                                  'soil',
-                                  'waste',
-                                  'water',
-                                  'other_issues'],
-                  'sectors_and_activities' : ['agriculture',
-                                              'energy',
-                                              'fishery',
-                                              'households',
-                                              'industry',
-                                              'economy',
-                                              'tourism',
-                                              'transport'],
+        topics = {'env_issues': ['air',
+                                 'biodiversity',
+                                 'chemicals',
+                                 'climate',
+                                 'human',
+                                 'landuse',
+                                 'natural',
+                                 'noise',
+                                 'soil',
+                                 'waste',
+                                 'water',
+                                 'other_issues'],
+                  'sectors_and_activities': ['agriculture',
+                                             'energy',
+                                             'fishery',
+                                             'households',
+                                             'industry',
+                                             'economy',
+                                             'tourism',
+                                             'transport'],
                   'across_env': ['technology',
                                  'policy',
                                  'scenarios'],
@@ -614,7 +626,7 @@ def reports_rdf():
 @views.route('/atom/', methods=['GET'])
 def reports_atom():
     from datetime import datetime
-    #TODO change when multiple reviews will be implemented
+    # TODO change when multiple reviews will be implemented
     feed = AtomFeed('SERIS Reports',
                     feed_url=make_external('atom'),
                     url=make_external('')
@@ -625,12 +637,13 @@ def reports_atom():
                  content_type='html', author=report['header_uploader'],
                  url=make_external(report['url']),
                  updated=datetime.strptime(report['header_upload_date'],
-                        '%d %b %Y, %H:%M'))
+                                           '%d %b %Y, %H:%M'))
     return feed.get_response()
+
 
 @views.route('/json/', methods=['GET'])
 def reports_json():
-    #TODO change when multiple reviews will be implemented
+    # TODO change when multiple reviews will be implemented
     export = {}
     properties = {}
     count = [0]
@@ -640,9 +653,10 @@ def reports_json():
     export['properties'] = properties
     return flask.jsonify(export)
 
+
 def make_external(url):
     return urljoin(flask.request.url_root, url)
-    #return urljoin('http://projects.eionet.europa.eu/seris-revision/seris', url)
+
 
 def get_reports(with_url=None):
     reports = []
@@ -669,7 +683,7 @@ def get_reports(with_url=None):
         report['details_original_language'] = details_original_language
         if with_url:
             report['url'] = make_external(flask.url_for('views.report_view',
-                            report_id=report.id))
+                                          report_id=report.id))
         seris_review = reviews_dict[str(report.id)]
         reports.append(dict(report, **seris_review))
     return reports
@@ -694,6 +708,7 @@ def get_schema_items(ob, properties, count):
         properties[ob.flattened_name()] = {'valueType': valueType, 'order': count[0]}
         count[0] += 1
 
+
 @views.route('/reports/<int:report_id>/delete/', methods=['POST'])
 @require_edit_permission
 def report_delete(report_id):
@@ -701,7 +716,7 @@ def report_delete(report_id):
         session = database.get_session()
         reviews_list = database.get_seris_reviews_list(report_id)
         if reviews_list:
-            #TODO change when multiple reviews will be implemented
+            # TODO change when multiple reviews will be implemented
             session.table(database.SerisReviewRow) \
                    .delete(reviews_list[0].id)
 
@@ -725,17 +740,17 @@ def report_view(report_id):
     country = flask.request.args.get('country')
     region = flask.request.args.get('region')
     return flask.render_template('report_view.html', **{
-            'mk': MarkupGenerator(app.jinja_env.get_template('widgets-view.html')),
-            'report': {'id': report_id,
-                       'data': schema.ReportSchema.from_flat(report),
-                       'seris_reviews': [
-                          {'id': row.id,
-                           'data': schema.SerisReviewSchema.from_flat(row)}
-                          for row in database.get_seris_reviews_list(report_id)]
-                      },
-            'country': country,
-            'region': region,
-            'edit_is_allowed': edit_is_allowed(report_id),
+        'mk': MarkupGenerator(app.jinja_env.get_template('widgets-view.html')),
+        'report': {'id': report_id,
+                   'data': schema.ReportSchema.from_flat(report),
+                   'seris_reviews': [
+                       {'id': row.id,
+                        'data': schema.SerisReviewSchema.from_flat(row)} for
+                       row in database.get_seris_reviews_list(report_id)]
+                   },
+        'country': country,
+        'region': region,
+        'edit_is_allowed': edit_is_allowed(report_id),
         }
     )
 
@@ -747,6 +762,7 @@ def google_translate():
     src_lang = flask.request.args.get('src_lang')
     return translate(text, dest_lang, src_lang)
 
+
 @views.route('/download/<int:db_id>')
 def download(db_id):
     session = database.get_session()
@@ -754,7 +770,7 @@ def download(db_id):
         db_file = session.get_db_file(db_id)
     except KeyError:
         flask.abort(404)
-    return flask.Response(''.join(db_file.iter_data()), # TODO stream response
+    return flask.Response(''.join(db_file.iter_data()),  # TODO stream response
                           mimetype="application/octet-stream")
 
 
