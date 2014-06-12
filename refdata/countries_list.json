@@ -8,6 +8,7 @@
 ["Cyprus", ["eionet-nfp-mc-cy", "eionet-nrc-soe-mc-cy"]],
 ["Czech Republic", ["eionet-nfp-mc-cz", "eionet-nrc-soe-mc-cz"]],
 ["Denmark", ["eionet-nfp-mc-dk", "eionet-nrc-soe-mc-dk"]],
+["EEA", ["eionet-nfp-mc-eea", "eionet-nrc-soe-mc-eea"]],
 ["Estonia", ["eionet-nfp-mc-ee", "eionet-nrc-soe-mc-ee"]],
 ["Finland", ["eionet-nfp-mc-fi", "eionet-nrc-soe-mc-fi"]],
 ["France", ["eionet-nfp-mc-fr", "eionet-nrc-soe-mc-fr"]],
