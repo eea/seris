@@ -34,7 +34,7 @@
 ["Serbia", ["eionet-nfp-cc-rs", "eionet-nrc-soe-cc-rs"]],
 ["Slovakia", ["eionet-nfp-mc-sk", "eionet-nrc-soe-mc-sk"]],
 ["Slovenia", ["eionet-nfp-mc-si", "eionet-nrc-soe-mc-si"]],
-["Spain", ["eionet-nfp-mc-sp", "eionet-nrc-soe-mc-sp"]],
+["Spain", ["eionet-nfp-mc-es", "eionet-nrc-soe-mc-es"]],
 ["Sweden", ["eionet-nfp-mc-se", "eionet-nrc-soe-mc-se"]],
 ["Switzerland", ["eionet-nfp-mc-ch", "eionet-nrc-soe-mc-ch"]],
 ["Turkey", ["eionet-nfp-mc-tr", "eionet-nrc-soe-mc-tr"]],
