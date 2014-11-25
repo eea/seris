@@ -27,4 +27,4 @@ def send_notification_mail(report_url, report_name, action,
            }
         )
     send_mail('subiect', flask.current_app.config['ADMINISTRATOR_EMAILS'],
-              msg.encode('utf-8'))
+              msg)
