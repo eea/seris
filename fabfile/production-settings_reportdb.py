@@ -8,8 +8,12 @@ if secret_key_path.isfile():
 
 DATABASE_URI = "postgresql://edw:edw@localhost/reportdb"
 TESTING_DATABASE_URI = "postgresql://edw:edw@localhost/reportdb_test"
-FRAME_URL = 'http://projects.eionet.europa.eu/seris-revision/report_templates/frame'
+FRAME_URL = (
+    'http://projects.eionet.europa.eu/seris-revision/report_templates/frame')
 HTTP_PROXIED = True
 ZOPE_TEMPLATE_CACHE = True
 FRAME_COOKIES = ['__ac', '_ZopeId']
 HTTP_PROXIED = True
+MAIL_FAIL_SILENTLY = False
+DEFAULT_MAIL_SENDER = 'no-reply@eionet.europa.eu'
+ADMINISTRATOR_EMAILS = ['valentin.dumitru@gmail.com']

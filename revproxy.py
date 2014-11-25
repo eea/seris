@@ -1,6 +1,7 @@
 # working behind a reverse proxy
 # http://flask.pocoo.org/snippets/35/
 
+
 class ReverseProxied(object):
 
     def __init__(self, app):

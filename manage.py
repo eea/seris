@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import datetime
 
 import flask
 import flaskext.script
@@ -40,9 +39,11 @@ manager = flaskext.script.Manager(create_app)
 def resetdb():
     database.get_session().drop_all()
 
+
 @manager.command
 def syncdb():
     database.get_session().create_all()
+
 
 @manager.command
 def import_seris():
@@ -87,26 +88,31 @@ def import_seris():
                         found = True
                 if not found:
                     if country == 'eea':
-                        print 'Skipped report %s from eea: countries not in scope' % form_data.get('details_original_name')
-                        skipped +=1
+                        print ('Skipped report %s from eea: '
+                               'countries not in scope' %
+                               form_data.get('details_original_name'))
+                        skipped += 1
                         continue
                     else:
-                        form_data['header_country_0'] = countries_mapping[country]
+                        form_data['header_country_0'] = countries_mapping[
+                            country]
 
                 if country == 'eea':
-                    form_data['header_region_0'] = 'European Environment Agency'
+                    form_data['header_region_0'] = (
+                        'European Environment Agency')
                 if form_data.get('category') == 'National portal':
                     form_data['format_report_type'] = 'portal (dynamic source)'
                 try:
-                    year = int(form_data.get('format_date_of_publication'))
+                    int(form_data.get('format_date_of_publication'))
                 except ValueError:
                     print 'Report %s in country %s - invalid year "%s"' % (
                         form_data.get('details_original_name'), country,
-                            form_data.get('format_date_of_publication'))
+                        form_data.get('format_date_of_publication'))
                 except TypeError:
                     pass
                 report_schema = schema.ReportSchema.from_flat(form_data)
-                seris_review_schema = schema.SerisReviewSchema.from_flat(form_data)
+                seris_review_schema = schema.SerisReviewSchema.from_flat(
+                    form_data)
 
                 report_row.update(report_schema.flatten())
                 uploader = 'Imported from SERIS 1'
@@ -115,7 +121,7 @@ def import_seris():
                 session.save(report_row)
                 seris_review_schema['report_id'].set(report_row.id)
 
-                #Review part
+                # Review part
                 seris_review_row.clear()
                 seris_review_row.update(seris_review_schema.flatten())
                 session.save(seris_review_row)
@@ -124,6 +130,7 @@ def import_seris():
                 session.commit()
     print '%s reports imported' % imported
     print '%s reports skipped' % skipped
+
 
 def _debug_log(name):
     import logging

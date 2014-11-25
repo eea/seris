@@ -17,6 +17,7 @@ from schema import countries_list, countries_dict, regions_dict
 from schema import subregions_dict, check_common, mappings
 from rdflib import Graph, Literal, BNode, Namespace, RDF, URIRef
 from rdflib.namespace import DC, FOAF, DCTERMS, SKOS, RDFS
+from emails import send_notification_mail
 
 
 def _load_json(name):
@@ -254,31 +255,59 @@ def report_edit(report_id=None):
             if not uploader:
                 uploader = 'Developer'
             report_row['header_uploader'] = uploader
-            report_row['header_upload_date'] = datetime.datetime.now().strftime('%d %b %Y, %H:%M')
+            now = datetime.datetime.now()
+            report_row['header_upload_date'] = now.strftime('%d %b %Y, %H:%M')
             session.save(report_row)
             seris_review_schema['report_id'].set(report_row.id)
 
             if seris_review_schema.validate():
-
                 seris_review_row.clear()
                 seris_review_row.update(seris_review_schema.flatten())
                 if seris_review_row['structure_indicator_based'] == 'No':
                     seris_review_row['structure_indicators_estimation'] = ''
-                    seris_review_row['structure_indicators_usage_to_compare_countries'] = ''
-                    seris_review_row['structure_indicators_usage_to_compare_subnational'] = ''
-                    seris_review_row['structure_indicators_usage_to_compare_eea'] = ''
-                    seris_review_row['structure_indicators_usage_to_compare_global'] = ''
-                    seris_review_row['structure_indicators_usage_to_assess_progress'] = ''
-                    seris_review_row['structure_indicators_usage_to_evaluate'] = ''
-                    seris_review_row['structure_indicators_usage_evaluation_method'] = ''
-                elif not seris_review_row['structure_indicators_usage_to_evaluate']:
-                    seris_review_row['structure_indicators_usage_evaluation_method'] = ''
+                    seris_review_row[
+                        'structure_indicators_usage_to_compare_countries'] = ''
+                    seris_review_row[
+                        'structure_indicators_usage_to_compare_subnational'
+                        ] = ''
+                    seris_review_row[
+                        'structure_indicators_usage_to_compare_eea'] = ''
+                    seris_review_row[
+                        'structure_indicators_usage_to_compare_global'] = ''
+                    seris_review_row[
+                        'structure_indicators_usage_to_assess_progress'] = ''
+                    seris_review_row[
+                        'structure_indicators_usage_to_evaluate'] = ''
+                    seris_review_row[
+                        'structure_indicators_usage_evaluation_method'] = ''
+                elif not seris_review_row[
+                        'structure_indicators_usage_to_evaluate']:
+                    seris_review_row[
+                        'structure_indicators_usage_evaluation_method'] = ''
                 session.save(seris_review_row)
 
                 session.commit()
+
                 flask.flash("Report saved.", "success")
                 url = flask.url_for('views.report_view',
                                     report_id=report_row.id)
+
+                title = report_row['details_original_name']
+                if report_id is None:
+                    action = 'added to'
+                else:
+                    action = 'edited in'
+                contributor_name = '%s %s' % (
+                    getattr(flask.g, 'user_first_name'),
+                    getattr(flask.g, 'user_last_name'))
+                contributor_profile = (
+                    'http://www.eionet.europa.eu/directory/user?uid=%s' %
+                    uploader)
+                send_notification_mail(
+                    '%s%s' % (flask.request.host, url),
+                    title, action, contributor_profile, contributor_name,
+                    uploader)
+
                 if country:
                     url = url+'?country='+country
                 if region:
@@ -330,15 +359,18 @@ def reports_rdf():
     export = get_reports()
 
     bibo = Namespace('http://uri.gbv.de/ontology/bibo/')
-    nao = Namespace('http://www.semanticdesktop.org/ontologies/2007/08/15/nao#')
+    nao = Namespace(
+        'http://www.semanticdesktop.org/ontologies/2007/08/15/nao#')
     theme = Namespace('http://www.eea.europa.eu/themes/')
     bibtex = Namespace('http://purl.org/net/nknouf/ns/bibtex#')
-    seris = Namespace('http://forum.eionet.europa.eu/nrc-state-environment/seris/ontology/schema#')
-    mitype = Namespace('http://purl.org/dc/dcmitype/')
+    seris = Namespace(
+        'http://forum.eionet.europa.eu/nrc-state-environment/seris/ontology/'
+        'schema#')
 
     for entry in export:
         current_id = entry['report_id']
-        current_uri = flask.url_for('views.report_view', report_id=current_id, _external=True)
+        current_uri = flask.url_for('views.report_view', report_id=current_id,
+                                    _external=True)
 
         node = URIRef(current_uri)
 
@@ -375,7 +407,7 @@ def reports_rdf():
         lang_id = 0
         lang_field = 'details_translated_in_%s' % lang_id
         while lang_field in entry.keys():
-            idtem = BNode()
+            item = BNode()
             g.add((node, DCTERMS.language, item))
             g.add((item, RDF.type, DCTERMS.LinguisticSystem))
             g.add((
@@ -513,7 +545,8 @@ def reports_rdf():
             for topic in topics[key]:
                 focus = 'topics_' + key + '_' + topic + '_focus'
                 indicators = 'topics_' + key + '_' + topic + '_indicators'
-                current_item = "http://www.eea.europa.eu/themes/%(topic)s" % {"topic": topic}
+                current_item = "http://www.eea.europa.eu/themes/%(topic)s" % {
+                    "topic": topic}
                 item = BNode()
                 if (entry[focus] or entry[indicators]):
                     g.add((node, nao.hasTopic, item))
@@ -532,7 +565,8 @@ def reports_rdf():
                             Literal(entry[indicators])))
             topic = 'topics_' + key + '_extra_topic_extra_topic_input'
             focus = 'topics_' + key + '_extra_topic_other_radio_focus'
-            indicators = 'topics_' + key + '_extra_topic_other_radio_indicators'
+            indicators = ('topics_' + key +
+                          '_extra_topic_other_radio_indicators')
             if entry[topic]:
                 item = BNode()
                 g.add((node, nao.hasTopic, item))
@@ -563,10 +597,12 @@ def reports_rdf():
                 usage += entry['structure_indicators_usage_to_assess_progress']
                 usage += ' to assess progress to target/treshold.'
             if entry['structure_indicators_usage_to_compare_countries']:
-                usage += entry['structure_indicators_usage_to_compare_countries']
+                usage += entry[
+                    'structure_indicators_usage_to_compare_countries']
                 usage += ' to compare with other countries/EU.'
             if entry['structure_indicators_usage_to_compare_subnational']:
-                usage += entry['structure_indicators_usage_to_compare_subnational']
+                usage += entry[
+                    'structure_indicators_usage_to_compare_subnational']
                 usage += ' to compare at subnational level.'
             if entry['structure_indicators_usage_to_compare_eea']:
                 usage += entry['structure_indicators_usage_to_compare_eea']
@@ -579,7 +615,8 @@ def reports_rdf():
                 usage += ' to rank/evaluate.'
                 if entry['structure_indicators_usage_evaluation_method']:
                     usage += 'evaluation method: '
-                    usage += entry['structure_indicators_usage_evaluation_method']
+                    usage += entry[
+                        'structure_indicators_usage_evaluation_method']
             if usage:
                 g.add((item, SKOS.scopeNote, Literal(usage)))
 
@@ -705,7 +742,8 @@ def get_schema_items(ob, properties, count):
             valueType = 'text'
         elif isinstance(ob, fl.Boolean):
             valueType = 'bool'
-        properties[ob.flattened_name()] = {'valueType': valueType, 'order': count[0]}
+        properties[ob.flattened_name()] = {'valueType': valueType,
+                                           'order': count[0]}
         count[0] += 1
 
 
