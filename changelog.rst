@@ -1,6 +1,6 @@
 2014-11-25
 ----------
-* notifications for adding and editing reports [dumitval]
+* notifications for adding, editing and deleting reports [dumitval]
 
 2014-11-13
 ----------

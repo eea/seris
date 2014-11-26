@@ -758,8 +758,22 @@ def report_delete(report_id):
             session.table(database.SerisReviewRow) \
                    .delete(reviews_list[0].id)
 
+        report_row = database.get_report_or_404(report_id)
+        title = report_row['details_original_name']
         session.table(database.ReportRow).delete(report_id)
         session.commit()
+
+        action = 'deleted from'
+        contributor_id = getattr(flask.g, 'user_id')
+        contributor_name = '%s %s' % (
+            getattr(flask.g, 'user_first_name'),
+            getattr(flask.g, 'user_last_name'))
+        contributor_profile = (
+            'http://www.eionet.europa.eu/directory/user?uid=%s' %
+            contributor_id)
+        send_notification_mail(None, title, action, contributor_profile,
+                               contributor_name, contributor_id)
+
         flask.flash("Report deleted.", "success")
         url = flask.url_for('views.report_list')
         country = flask.request.args.get('country')
