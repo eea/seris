@@ -8,6 +8,16 @@
       {% else %}
         "{{report_name}}"
       {% endif %}
-     was {{action}} the Seris library by <a href="{{contributor_profile}}">{{contributor_name}}</a>.</p>
+     was
+      {% if action == 'added' %}
+        added to
+      {% elif action == 'edited' %}
+        edited in
+      {% elif action == 'deleted' %}
+        deleted from
+      {% else %}
+        !!!missing action!!!
+      {% endif %}
+     the Seris library by <a href="{{contributor_profile}}">{{contributor_name}}</a>.</p>
   </body>
 </html>

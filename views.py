@@ -294,9 +294,9 @@ def report_edit(report_id=None):
 
                 title = report_row['details_original_name']
                 if report_id is None:
-                    action = 'added to'
+                    action = 'added'
                 else:
-                    action = 'edited in'
+                    action = 'edited'
                 contributor_name = '%s %s' % (
                     getattr(flask.g, 'user_first_name'),
                     getattr(flask.g, 'user_last_name'))
@@ -763,7 +763,7 @@ def report_delete(report_id):
         session.table(database.ReportRow).delete(report_id)
         session.commit()
 
-        action = 'deleted from'
+        action = 'deleted'
         contributor_id = getattr(flask.g, 'user_id')
         contributor_name = '%s %s' % (
             getattr(flask.g, 'user_first_name'),

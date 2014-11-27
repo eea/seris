@@ -6,7 +6,7 @@ mail = Mail(app)
 
 
 def send_mail(subject, recipients, html_body, text_body=None):
-    msg = Message(subject=subject, recipients=recipients)
+    msg = Message(subject=subject, recipients=recipients, charset='utf-8')
     if text_body:
         msg.body = text_body
     msg.html = html_body
@@ -26,5 +26,6 @@ def send_notification_mail(report_url, report_name, action,
            'contributor_id': contributor_id,
            }
         )
-    send_mail('subiect', flask.current_app.config['ADMINISTRATOR_EMAILS'],
+    send_mail('Report %s' % action,
+              flask.current_app.config['ADMINISTRATOR_EMAILS'],
               msg)
