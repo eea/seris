@@ -16,5 +16,4 @@ FRAME_COOKIES = ['__ac', '_ZopeId']
 HTTP_PROXIED = True
 MAIL_FAIL_SILENTLY = False
 DEFAULT_MAIL_SENDER = 'no-reply@eionet.europa.eu'
-# ADMINISTRATOR_EMAILS = ['milan.chrenko@eea.europa.eu']
-ADMINISTRATOR_EMAILS = ['valentin.dumitru@gmail.com']
+ADMINISTRATOR_EMAILS = ['milan.chrenko@eea.europa.eu']
