@@ -251,7 +251,7 @@ def report_edit(report_id=None):
                     'web only', 'web and print']:
                 if not report_row['format_availability_registration_required']:
                     report_row['format_availability_costs'] = 'free'
-            uploader = getattr(flask.g, 'user_id')
+            uploader = getattr(flask.g, 'user_id', None)
             if not uploader:
                 uploader = 'Developer'
             report_row['header_uploader'] = uploader
@@ -297,16 +297,18 @@ def report_edit(report_id=None):
                     action = 'added'
                 else:
                     action = 'edited'
-                contributor_name = '%s %s' % (
-                    getattr(flask.g, 'user_first_name'),
-                    getattr(flask.g, 'user_last_name'))
-                contributor_profile = (
-                    'http://www.eionet.europa.eu/directory/user?uid=%s' %
-                    uploader)
-                send_notification_mail(
-                    '%s%s' % (flask.request.host, url),
-                    title, action, contributor_profile, contributor_name,
-                    uploader)
+                if not flask.current_app.config.get('SKIP_EDIT_AUTHORIZATION',
+                                                    False):
+                    contributor_name = '%s %s' % (
+                        getattr(flask.g, 'user_first_name'),
+                        getattr(flask.g, 'user_last_name'))
+                    contributor_profile = (
+                        'http://www.eionet.europa.eu/directory/user?uid=%s' %
+                        uploader)
+                    send_notification_mail(
+                        '%s%s' % (flask.request.host, url),
+                        title, action, contributor_profile, contributor_name,
+                        uploader)
 
                 if country:
                     url = url+'?country='+country

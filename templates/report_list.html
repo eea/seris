@@ -32,6 +32,7 @@
 		<th>Year of publication</th>
 		<th>Published by</th>
 		<th>Factsheet prepared by</th>
+		<th>Last modification</th>
 	</thead>
 	<tbody>
 	{% for report in report_list %}
@@ -56,6 +57,7 @@
 			<td>{{ report['data']['format']['date_of_publication'] }}</td>
 			<td>{{ report['data']['details']['publisher'] }}</td>
 			<td>{{ report['data']['header']['uploader'] }}</td>
+			<td>{{ report['data']['header']['upload_date'] }}</td>
 		</tr>
 	{% endfor %}
 	</tbody>
@@ -85,7 +87,7 @@
 <script>
 $(document).ready(function() {
 	$('.report-listing').dataTable({
-		'aaSorting': [[0, "asc"]],
+		'aaSorting': [[6, "desc"]],
 		'sPaginationType': 'full_numbers',
 		"aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
 		"iDisplayLength": 25
