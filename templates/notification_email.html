@@ -1,0 +1,23 @@
+<html>
+  <body>
+    <p>Hello,</p>
+
+    <p>The report
+      {% if report_url %}
+        "<a href="{{report_url}}">{{report_name}}</a>"
+      {% else %}
+        "{{report_name}}"
+      {% endif %}
+     was
+      {% if action == 'added' %}
+        added to
+      {% elif action == 'edited' %}
+        edited in
+      {% elif action == 'deleted' %}
+        deleted from
+      {% else %}
+        !!!missing action!!!
+      {% endif %}
+     the Seris library by <a href="{{contributor_profile}}">{{contributor_name}}</a>.</p>
+  </body>
+</html>
