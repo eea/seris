@@ -25,14 +25,14 @@ Quick installation
 
 5. Set up the PostgreSQL database::
 
-    createdb reportdb
-    psql reportdb -c 'create extension hstore'
+    createdb seris
+    psql seris -c 'create extension hstore'
     ./manage.py syncdb
 
 6. Create a testing database and run the unit tests::
 
-    createdb reportdb_test
-    psql reportdb_test -c 'create extension hstore'
+    createdb seris_test
+    psql seris_test -c 'create extension hstore'
     nosetests
 
 7. Run a test server::
@@ -59,18 +59,18 @@ extension, and grant access to a user::
 
     template1=# CREATE USER edw WITH PASSWORD 'edw';
     CREATE ROLE
-    template1=# CREATE DATABASE reportdb;
+    template1=# CREATE DATABASE seris;
     CREATE DATABASE
-    template1=# GRANT ALL PRIVILEGES ON DATABASE reportdb TO edw;
+    template1=# GRANT ALL PRIVILEGES ON DATABASE seris TO edw;
     GRANT
     template1=# \q
-    postgres $ psql reportdb
-    reportdb=# create extension hstore;
+    postgres $ psql seris
+    seris=# create extension hstore;
 
 Update the local settings::
 
-    echo 'DATABASE_URI = "postgresql://edw:edw@localhost/reportdb"' >> instance/settings.py
-    echo 'TESTING_DATABASE_URI = "postgresql://edw:edw@localhost/reportdb_test"' >> instance/settings.py
+    echo 'DATABASE_URI = "postgresql://edw:edw@localhost/seris"' >> instance/settings.py
+    echo 'TESTING_DATABASE_URI = "postgresql://edw:edw@localhost/seris_test"' >> instance/settings.py
 
 
 Development
