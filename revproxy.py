@@ -1,5 +1,6 @@
 # working behind a reverse proxy
 # http://flask.pocoo.org/snippets/35/
+import os
 
 
 class ReverseProxied(object):
@@ -8,7 +9,8 @@ class ReverseProxied(object):
         self.app = app
 
     def __call__(self, environ, start_response):
-        script_name = environ.get('HTTP_X_SCRIPT_NAME', '')
+        script_name = environ.get('HTTP_X_SCRIPT_NAME',
+                                  os.environ.get('HTTP_X_SCRIPT_NAME', ''))
         if script_name:
             environ['SCRIPT_NAME'] = script_name
             path_info = environ['PATH_INFO']
