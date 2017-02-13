@@ -41,6 +41,8 @@ def get_frame_before_request():
     app = flask.current_app
     url = app.config['FRAME_URL']
     if url is None:
+        if not app.debug:
+            raise Exception('No FRAME_URL defined.')
         return
     forwarded_cookies = {}
     for name in app.config.get('FRAME_COOKIES', []):
@@ -48,7 +50,12 @@ def get_frame_before_request():
             forwarded_cookies[name] = flask.request.cookies[name]
     response = requests.get(url, cookies=forwarded_cookies)
     if response.status_code != 200:
+        if not app.debug:
+            raise Exception('Frame request returned an error code: {}.'.format(
+                response.status_code))
         return
+    if not response.text and not app.debug:
+        raise Exception('Frame request returned an empty response.')
     assert response.headers['content-type'] == 'application/json'
 
     flask.g.frame_response = frame_response = flask.json.loads(response.text)

@@ -3,6 +3,7 @@
 import flask
 import flaskext.script
 import database
+from raven.contrib.flask import Sentry
 
 default_config = {
     'DATABASE_URI': 'postgresql://localhost/reportdb',
@@ -28,6 +29,10 @@ def create_app():
     if app.config["HTTP_PROXIED"]:
         from revproxy import ReverseProxied
         app.wsgi_app = ReverseProxied(app.wsgi_app)
+
+    if app.config["SENTRY_DSN"]:
+        sentry = Sentry()
+        sentry.init_app(app)
 
     return app
 
