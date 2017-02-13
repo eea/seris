@@ -6,7 +6,7 @@ COPY requirements.txt requirements-dev.txt /seris/
 WORKDIR seris
 
 # Install requirements
-RUN apt-get install -y git \
+RUN apt-get update && apt-get install -y git \
   && pip install -r requirements-dev.txt
 
 # Copy code
