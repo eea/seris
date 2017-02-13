@@ -14,4 +14,4 @@ path.py==2.2.2
 supervisor==3.0a12
 psycopg2==2.4.5
 rdflib==4.0.1
-raven=5.1.1
+raven==5.1.1
