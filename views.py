@@ -149,9 +149,9 @@ def report_list():
     country = flask.request.args.get('country')
     region = flask.request.args.get('region')
     if country:
-        report_list = [report for report in report_list
-                       if country in report['data']['header']['country'].value
-                       and len(report['data']['header']['country'].value) == 1]
+        report_list = [report for report in report_list if country in
+                       report['data']['header']['country'].value and
+                       len(report['data']['header']['country'].value) == 1]
     if region:
         report_list = [report for report in report_list
                        if region in report['data']['header']['region'].value]
@@ -269,7 +269,7 @@ def report_edit(report_id=None):
                         'structure_indicators_usage_to_compare_countries'] = ''
                     seris_review_row[
                         'structure_indicators_usage_to_compare_subnational'
-                        ] = ''
+                    ] = ''
                     seris_review_row[
                         'structure_indicators_usage_to_compare_eea'] = ''
                     seris_review_row[
@@ -303,7 +303,7 @@ def report_edit(report_id=None):
                         getattr(flask.g, 'user_first_name'),
                         getattr(flask.g, 'user_last_name'))
                     contributor_profile = (
-                        'http://www.eionet.europa.eu/directory/user?uid=%s' %
+                        'https://www.eionet.europa.eu/directory/user?uid=%s' %
                         uploader)
                     send_notification_mail(
                         '%s%s' % (flask.request.host, url),
@@ -311,9 +311,9 @@ def report_edit(report_id=None):
                         uploader)
 
                 if country:
-                    url = url+'?country='+country
+                    url = url + '?country=' + country
                 if region:
-                    url = url+'?region='+region
+                    url = url + '?region=' + region
                 return flask.redirect(url)
 
         session.rollback()
@@ -337,7 +337,7 @@ def report_edit(report_id=None):
         'seris_review_schema': seris_review_schema,
         'country': country,
         'region': region,
-        })
+    })
 
 
 @views.route('/rdf-mapping/', methods=['GET'])
@@ -363,10 +363,10 @@ def reports_rdf():
     bibo = Namespace('http://uri.gbv.de/ontology/bibo/')
     nao = Namespace(
         'http://www.semanticdesktop.org/ontologies/2007/08/15/nao#')
-    theme = Namespace('http://www.eea.europa.eu/themes/')
+    theme = Namespace('https://www.eea.europa.eu/themes/')
     bibtex = Namespace('http://purl.org/net/nknouf/ns/bibtex#')
     seris = Namespace(
-        'http://forum.eionet.europa.eu/nrc-state-environment/seris/ontology/'
+        'https://forum.eionet.europa.eu/nrc-state-environment/seris/ontology/'
         'schema#')
 
     for entry in export:
@@ -547,7 +547,7 @@ def reports_rdf():
             for topic in topics[key]:
                 focus = 'topics_' + key + '_' + topic + '_focus'
                 indicators = 'topics_' + key + '_' + topic + '_indicators'
-                current_item = "http://www.eea.europa.eu/themes/%(topic)s" % {
+                current_item = "https://www.eea.europa.eu/themes/%(topic)s" % {
                     "topic": topic}
                 item = BNode()
                 if (entry[focus] or entry[indicators]):
@@ -771,7 +771,7 @@ def report_delete(report_id):
             getattr(flask.g, 'user_first_name'),
             getattr(flask.g, 'user_last_name'))
         contributor_profile = (
-            'http://www.eionet.europa.eu/directory/user?uid=%s' %
+            'https://www.eionet.europa.eu/directory/user?uid=%s' %
             contributor_id)
         send_notification_mail(None, title, action, contributor_profile,
                                contributor_name, contributor_id)
@@ -780,10 +780,10 @@ def report_delete(report_id):
         url = flask.url_for('views.report_list')
         country = flask.request.args.get('country')
         if country:
-            url = url+'?country='+country
+            url = url + '?country=' + country
         region = flask.request.args.get('region')
         if region:
-            url = url+'?region='+region
+            url = url + '?region=' + region
         return flask.redirect(url)
 
 
@@ -805,8 +805,7 @@ def report_view(report_id):
         'country': country,
         'region': region,
         'edit_is_allowed': edit_is_allowed(report_id),
-        }
-    )
+    })
 
 
 @views.route('/translate', methods=['GET', 'POST'])

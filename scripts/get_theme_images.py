@@ -12,15 +12,15 @@ theme_names = [
     'technology', 'policy', 'scenarios',
 ]
 
-themes_path = path(__file__).parent.parent/'static'/'themes'
+themes_path = path(__file__).parent.parent + '/static/themes'
 
 
 def get_and_resize(name, target_size):
-    url = 'http://www.eea.europa.eu/themes/%s/theme_image/image_large' % name
+    url = 'https://www.eea.europa.eu/themes/%s/theme_image/image_large' % name
     data = requests.get(url).content
     image = PIL.Image.open(StringIO(data))
     image.thumbnail(target_size)
-    out_path = themes_path/'%s-40.png' % name
+    out_path = themes_path + '/%s-40.png' % name
     image.save(out_path)
     print out_path
 
