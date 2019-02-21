@@ -3,8 +3,8 @@ Quick installation
 
 1. Check out the repository::
 
-    svn co https://svn.eionet.europa.eu/repositories/Naaya/trunk/eggs/reportdb
-    cd reportdb
+    git clone https://github.com/eea/eea.seris
+    cd eea.seris
 
 2. Create & activate a virtual environment::
 
@@ -76,7 +76,7 @@ Update the local settings::
 Development
 -----------
 
-ReportDB is developed using Flask_, with Jinja_ templates, and schema
+Seris is developed using Flask_, with Jinja_ templates, and schema
 defined with Flatland_. Data is stored in PostgreSQL using the special
 hstore_ column type, so there's no need for schema migration scripts on
 every change in the models.
