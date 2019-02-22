@@ -51,7 +51,9 @@
 			</a>
 			</td>
 			<td>
-				{{ ', '.join(report['data']['header']['country'].value) }}
+        {% for country_code in report['data']['header']['country'].value %}
+				{{ code_to_name[country_code] }}{{ ", " if not loop.last }}
+        {% endfor %}
 			</td>
 			<td>{{ report['extended_info'] }}</td>
 			<td>{{ report['data']['format']['date_of_publication'] }}</td>

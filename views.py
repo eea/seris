@@ -53,6 +53,7 @@ views = flask.Blueprint('views', __name__)
 
 
 views.before_request(frame.get_frame_before_request)
+code_to_name = _load_json('refdata/countries.json')
 
 
 def edit_is_allowed(report_id=None):
@@ -135,7 +136,8 @@ def index():
     return flask.render_template('index.html', **{
         'eea_countries_list': eea_countries_list,
         'cooperating_countries_list': cooperating_countries_list,
-        'regions_list': [('European Environment Agency', eea_count)]
+        'regions_list': [('European Environment Agency', eea_count)],
+        'code_to_name': code_to_name
     })
 
 
@@ -160,6 +162,7 @@ def report_list():
         'country': country,
         'region': region,
         'edit_is_allowed': edit_is_allowed(),
+        'code_to_name': code_to_name
     })
 
 
@@ -337,6 +340,7 @@ def report_edit(report_id=None):
         'seris_review_schema': seris_review_schema,
         'country': country,
         'region': region,
+        'code_to_name': code_to_name
     })
 
 
@@ -805,6 +809,7 @@ def report_view(report_id):
         'country': country,
         'region': region,
         'edit_is_allowed': edit_is_allowed(report_id),
+        'code_to_name': code_to_name
     })
 
 

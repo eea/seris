@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
+import os
 import flask
+import logging
 import flaskext.script
 import database
 from raven.contrib.flask import Sentry
+import sparql
+import simplejson as json
 
 default_config = {
     'DATABASE_URI': 'postgresql://localhost/reportdb',
@@ -11,6 +15,9 @@ default_config = {
     'HTTP_PROXIED': False,
     'FRAME_URL': None,
 }
+
+
+log = logging.getLogger(__name__)
 
 
 def create_app():
@@ -28,16 +35,75 @@ def create_app():
 
     if app.config["HTTP_PROXIED"]:
         from revproxy import ReverseProxied
-        app.wsgi_app = ReverseProxied(app.wsgi_app)
+        app.wsgi_app = ReverseProxied(app.wsgi_app, app.config)
 
-    if app.config["SENTRY_DSN"]:
+    if app.config.get("SENTRY_DSN"):
         sentry = Sentry()
         sentry.init_app(app)
 
     return app
 
 
+def _load_json(name):
+    with open(os.path.join(os.path.dirname(__file__), name), "rb") as f:
+        return json.load(f)
+
 manager = flaskext.script.Manager(create_app)
+
+
+@manager.command
+def update_country_names():
+    SPARQL_QUERY = """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX eea: <http://rdfdata.eionet.europa.eu/eea/ontology/>
+
+            SELECT DISTINCT ?code ?countryname ?publishingCode
+              IF(bound(?eumember),'Yes','') AS ?eu
+              IF(bound(?eeamember),'Yes','') AS ?eea
+              IF(bound(?eionetmember),'Yes','') AS ?eionet
+              IF(bound(?eun22member),'Yes','') AS ?eun22
+            WHERE {
+              ?ucountry a eea:Country ;
+                        eea:code ?code;
+                        eea:publishingCode ?publishingCode;
+                        rdfs:label ?countryname
+             OPTIONAL { <http://rdfdata.eionet.europa.eu/eea/countries/EU> skos:member ?ucountry, ?eumember }
+             OPTIONAL { <http://rdfdata.eionet.europa.eu/eea/countries/EUN22> skos:member ?ucountry, ?eun22member }
+             OPTIONAL { <http://rdfdata.eionet.europa.eu/eea/countries/EEA> skos:member ?ucountry, ?eeamember }
+             OPTIONAL { <http://rdfdata.eionet.europa.eu/eea/countries/EIONET> skos:member ?ucountry, ?eionetmember }
+            }"""
+    SPARQL_ENDPOINT = 'http://semantic.eea.europa.eu/sparql'
+
+    s = sparql.Service(SPARQL_ENDPOINT)
+    results = [i for i in s.query(SPARQL_QUERY).fetchone()]
+    countries = {}
+    for item in results:
+        countries[item[0].value.lower()] = item[1].value
+    f = open(("refdata/countries.json"), "w")
+    json.dump(countries, f)
+    f.close()
+
+
+@manager.command
+def migrate_country_name_to_code():
+    session = database.get_session()
+    countries = _load_json('refdata/countries.json')
+    old_countries = _load_json('refdata/old_countries.json')
+    country_mapping = {}
+    for k, v in countries.items():
+        country_mapping[v] = k
+    country_mapping.update(old_countries)
+    import pdb; pdb.set_trace()
+    for row in database.get_all_reports():
+        modified = False
+        for index in range(0, len(country_mapping) + 1):
+            country_name = row.get('header_country_' + str(index))
+            if country_name and country_name in country_mapping.keys():
+                row['header_country_' + str(index)] = country_mapping[country_name]
+                modified = True
+        if modified:
+            session.save(row)
+            session.commit()
 
 
 @manager.command

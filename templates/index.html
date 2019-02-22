@@ -17,7 +17,7 @@
 	{% for country, count in eea_countries_list %}
 		<div class="country-box">
 			<a href="{{url_for('views.report_list') }}?country={{ country }}"><img src="{{url_for('static', filename='lib/datatables/forward_enabled.png')}}" alt="Forward" />
-			{{- country }}</a> ({{ count }})
+			{{- code_to_name[country] }}</a> ({{ count }})
 		</div>
 	{% endfor %}
 
@@ -28,7 +28,7 @@
 	{% for country, count in cooperating_countries_list %}
 		<div class="country-box">
 			<a href="{{url_for('views.report_list') }}?country={{ country }}"><img src="{{url_for('static', filename='lib/datatables/forward_enabled.png')}}" alt="Forward" />
-			{{- country }}</a> ({{ count }})
+			{{- code_to_name[country] }}</a> ({{ count }})
 		</div>
 	{% endfor %}
 

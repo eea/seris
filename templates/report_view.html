@@ -111,7 +111,9 @@ $(document).ready(function() {
 					{% endif %}
 				</label>
 				<div class="controls country-listing">
-					{{ ', '.join(report['data']['header']['country'].value) }}
+        {% for country_code in report['data']['header']['country'].value %}
+				{{ code_to_name[country_code] }}{{ ", " if not loop.last }}
+        {% endfor %}
 				</div>
 			</div>
 			{% if report['data']['header']['subregion'].value %}
