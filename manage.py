@@ -93,7 +93,6 @@ def migrate_country_name_to_code():
     for k, v in countries.items():
         country_mapping[v] = k
     country_mapping.update(old_countries)
-    import pdb; pdb.set_trace()
     for row in database.get_all_reports():
         modified = False
         for index in range(0, len(country_mapping) + 1):
