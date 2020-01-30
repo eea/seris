@@ -8,7 +8,7 @@ argparse==1.2.1
 htables==0.5.1
 blinker==1.2
 flatland==0.8
-requests==0.11.1
+requests==2.20.0
 simplejson==2.5.0
 path.py==2.2.2
 supervisor==3.0a12
