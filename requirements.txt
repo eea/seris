@@ -1,4 +1,4 @@
-Flask==0.8
+Flask==1.0
 Flask-Script==0.3.3
 #Flask-Sendmail==0.1
 -e git+https://github.com/ajford/flask-sendmail.git#egg=master
