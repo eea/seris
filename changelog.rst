@@ -1,3 +1,7 @@
+2020-01-30
+----------
+* remove gb from the country list (Brexit) [dumitval]
+
 2014-11-25
 ----------
 * notifications for adding, editing and deleting reports [dumitval]
