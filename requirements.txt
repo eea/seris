@@ -3,7 +3,7 @@ Flask-Script==0.3.3
 #Flask-Sendmail==0.1
 -e git+https://github.com/ajford/flask-sendmail.git#egg=master
 Jinja2==2.6
-Werkzeug==0.8.3
+Werkzeug==0.15.3
 argparse==1.2.1
 htables==0.5.1
 blinker==1.2
