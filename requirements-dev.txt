@@ -1,7 +1,7 @@
 -r requirements.txt
 nose==1.1.2
 unittest2==0.5.1
-Pillow==1.7.7
+Pillow==8.1.1
 Fabric==1.4.1
 pycrypto==2.5
 ssh==1.7.13
